@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect,useCallback} from 'react';
 
 import MoviesList from './components/MoviesList';
 import './App.css';
@@ -8,7 +8,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] =  useState(null)
 
-   async function fetchMovieHandler(){
+  
+
+   const fetchMovieHandler = useCallback(async()=>{
     setIsLoading(true)
     setError(null)
     try {
@@ -35,8 +37,21 @@ function App() {
     setIsLoading(false)
     
     
-  }
- 
+  },[])
+  
+  useEffect(()=>{
+    fetchMovieHandler()
+  },[fetchMovieHandler])
+ let content = <p>Found No Movies</p>
+if (movies.length>0) {
+  content = <MoviesList movies={movies}/>
+}
+ if(error){
+  content = <p>{error}</p>
+ }
+ if (isLoading) {
+  content = <p>Loading...</p>
+ }
 
   return (
     <React.Fragment>
@@ -44,11 +59,8 @@ function App() {
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
       <section>
-        {!isLoading && movies.length>0 && <MoviesList movies={movies} />}
-        {!isLoading && movies.length===0 && !error &&<p>Found no movies</p>} 
-        {!isLoading && error &&<p>{error}</p>}
-        {isLoading &&  <p>Loading...</p>}
-      
+       
+      {content}
       </section>
     </React.Fragment>
   );
